@@ -1,2 +1,5 @@
 CMakeFiles
 build
+.vscode
+spdlog
+test
