@@ -48,12 +48,9 @@ include_directories(${CMAKE_SOURCE_DIR}/google/googletest/googletest/include)
 
 
 add_subdirectory(test)
-
 include_directories(${INCLUDES_DIR})
+
 add_executable(server_repka ${CPPS}) #EXECUTABLE
-
-
-#find_package(spdlog CONFIG)
 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
