@@ -12,7 +12,7 @@ std::string IRepka::set(const std::string& key, const std::string& val)
 	}
 	else {
 		std::string result = get(key);
-		del(key);
+		this->rmap.erase(key);
 		auto it = this->rmap.emplace(key, val);
 		if (it.second)
 			return "Success! " + result;
@@ -65,13 +65,15 @@ std::string IRepka::save_dump(const std::string& filename)
 	std::lock_guard<std::mutex> lock(repka_mutex);
 	std::ofstream outputFile(filename, std::ios::binary | std::ios::out); // open .bin file to save
 	// err
-	if (!outputFile)
+	if (!outputFile) {
 		return ERROR_MSG;
+	}
 
 	// write the size() to the file
 	const std::size_t mapSize = this->rmap.size();
-	if (!outputFile.write(reinterpret_cast<const char*>(&mapSize), sizeof(mapSize)))
+	if (!outputFile.write(reinterpret_cast<const char*>(&mapSize), sizeof(mapSize))) {
 		return ERROR_MSG;
+	}
 
 	// get separated key and value
 	for (auto& pair : this->rmap)
@@ -82,16 +84,20 @@ std::string IRepka::save_dump(const std::string& filename)
 		// write Size of key and value to the file first
 		const std::size_t keySize = key.size();
 		const std::size_t valueSize = value.size();
-		if (!outputFile.write(reinterpret_cast<const char*>(&keySize), sizeof(keySize)))
+		if (!outputFile.write(reinterpret_cast<const char*>(&keySize), sizeof(keySize))) {
 			return ERROR_MSG;
-		if (!outputFile.write(reinterpret_cast<const char*>(&valueSize), sizeof(valueSize)))
+		}
+		if (!outputFile.write(reinterpret_cast<const char*>(&valueSize), sizeof(valueSize))) {
 			return ERROR_MSG;
+		}
 
 		// write the key and value to the file
-		if (!outputFile.write(key.c_str(), key.size()))
+		if (!outputFile.write(key.c_str(), key.size())) {
 			return ERROR_MSG;
-		if (!outputFile.write(value.c_str(), value.size()))
+		}
+		if (!outputFile.write(value.c_str(), value.size())) {
 			return ERROR_MSG;
+		}
 	}
 	outputFile.close();
 	return "Dump has been succsessfuly created";
@@ -105,29 +111,37 @@ std::string IRepka::load_dump(const std::string& filename)
 	std::string ERROR_MSG("Failed. The file <"+filename+"> corrupted or doesn't exist");
 	std::ifstream inputFile(filename, std::ios::binary); // open the file
 
-	if (!inputFile)
+	if (!inputFile){
 		return ERROR_MSG;
+	}
 
 	// read the Size of map from the file
 	std::size_t mapSize = 0;
-	if (!inputFile.read(reinterpret_cast<char*>(&mapSize), sizeof(mapSize)))
+	if (!inputFile.read(reinterpret_cast<char*>(&mapSize), sizeof(mapSize))) {
 		return ERROR_MSG;
+	}
 
 	// read each pair from file to the cleared map;
 	for (size_t i = 0; i < mapSize; i++)
 	{
 		// read Size of key and value from the file;
 		std::size_t keySize = 0, valueSize = 0;
-		if (!inputFile.read(reinterpret_cast<char*>(&keySize), sizeof(keySize)))
+		if (!inputFile.read(reinterpret_cast<char*>(&keySize), sizeof(keySize))) {
 			return ERROR_MSG;
-		if (!inputFile.read(reinterpret_cast<char*>(&valueSize), sizeof(valueSize)))
+		}
+		if (!inputFile.read(reinterpret_cast<char*>(&valueSize), sizeof(valueSize))) {
 			return ERROR_MSG;
+		}
 
 		// read the key and the value from file
 		std::string key(keySize, '\0');
 		std::string value(valueSize, '\0');
-		inputFile.read(&key[0], keySize);
-		inputFile.read(&value[0], valueSize);
+		if (!inputFile.read(&key[0], keySize)) {
+			return ERROR_MSG;
+		}
+		if (!inputFile.read(&value[0], valueSize)) {
+			return ERROR_MSG;
+		}
 
 		this->rmap.emplace(key, value);
 	}

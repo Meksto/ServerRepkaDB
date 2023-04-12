@@ -31,7 +31,7 @@ protected:
 
 
 
-TEST_F(IRepkaTest, TestAddElement) {
+TEST_F(IRepkaTest, AddElementTest) {
     EXPECT_EQ(repka_->get(key1), "Doesn't exist");
     repka_->set(key1,value1); // Добавляем элемент
     EXPECT_EQ(repka_->get(key1), value1);
@@ -39,6 +39,15 @@ TEST_F(IRepkaTest, TestAddElement) {
     EXPECT_EQ(repka_->get(key2), "Doesn't exist");
     repka_->set(key2,value2); // Добавляем элемент
     EXPECT_EQ(repka_->get(key2), value2);
+}
+
+TEST_F(IRepkaTest, AddNewValueInAlreadyExistKey) {
+    EXPECT_EQ(repka_->get(key1), "Doesn't exist");
+    repka_->set(key1,value1); // Добавляем элемент
+    EXPECT_EQ(repka_->get(key1), value1);
+
+    repka_->set(key1,value2); // Добавляем новое значение по существующему ключу
+    EXPECT_EQ(repka_->get(key1), value2);
 }
 
 TEST_F(IRepkaTest, keyDoesntExist)
@@ -88,6 +97,7 @@ TEST_F(IRepkaTest, saveAndLoadDumpFile)
     EXPECT_EQ(repka_->get(key1), value1);
     EXPECT_EQ(repka_->get(key2), value2);
 } 
+
 
 class CommandResponsiveIRepkaPlug : public IRepka {
 public:
