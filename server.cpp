@@ -14,7 +14,7 @@
 static std::atomic<int> active_connections = 0;
 
 // spdlog init
-auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/logSinked.txt", true);
+auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/log.txt", true);
 auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 std::shared_ptr<spdlog::logger> logger = std::make_shared<spdlog::logger>("server", spdlog::sinks_init_list({file_sink, console_sink}));
 
